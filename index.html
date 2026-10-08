@@ -15,6 +15,7 @@
 <meta property="og:url" content="https://jull1et.github.io/povar-svetlana/">
 <meta property="og:locale" content="ru_RU">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preload" as="image" href="img/h-g1.webp" fetchpriority="high">
 <style>html { -webkit-text-size-adjust: 100%; }</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,7 +59,7 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: var(--board) url("img/board.jpg") center / cover no-repeat;
+  background: var(--board) url("img/board.webp") center / cover no-repeat;
   pointer-events: none;
 }
 .wrap { max-width: 620px; margin-inline: auto; }
@@ -382,9 +383,9 @@ h2 { margin: 0; font: 700 22px/1.2 var(--font-display); letter-spacing: 0.01em; 
 
   <section class="hero">
     <div class="plates" aria-hidden="true">
-      <img class="p1" src="img/g1.jpg" alt="" width="168" height="168">
-      <img class="p2" src="img/n1.jpg" alt="" width="132" height="132">
-      <img class="p3" src="img/s12.jpg" alt="" width="112" height="112">
+      <img class="p1" src="img/h-g1.webp" alt="" width="168" height="168" fetchpriority="high">
+      <img class="p2" src="img/h-n1.webp" alt="" width="132" height="132">
+      <img class="p3" src="img/h-s12.webp" alt="" width="112" height="112">
     </div>
     <h1>Выездной повар на банкет</h1>
     <p class="lead">Приеду к вам домой или на мероприятие и приготовлю праздничный стол вкусно и красиво.</p>
@@ -597,7 +598,7 @@ function render() {
     html += `<p class="cat-note">${c.limit ? `Выберите ${c.limit} ${plural(c.limit, c.one, c.few, c.many)}` : c.note}</p>`;
     for (const [i, d] of DISHES.filter(x => x.cat === c.id).entries()) {
       html += `<article class="dish" data-id="${d.id}">
-        <img class="plate" src="img/${d.id}.jpg" alt="${d.name}" width="88" height="88" loading="lazy">
+        <img class="plate" src="img/${d.id}.webp" alt="${d.name}" width="88" height="88" loading="lazy" decoding="async">
         <div class="info">
           <h3 class="name"><span class="code">${i + 1}</span>${d.name}</h3>
           ${d.desc ? `<p class="desc">${d.desc}</p>` : ""}
@@ -628,7 +629,7 @@ function update(bump) {
     const n = chosen(c.id).length;
     return `<li><a href="#${c.id}" style="display:contents"><span class="num">${c.limit}</span><span><b>${c.limit} ${plural(c.limit, c.one, c.few, c.many)} на выбор</b><small>выбрано ${n} из ${c.limit}</small></span></a></li>`;
   }).concat(INCLUDED.map(i => i.img
-    ? `<li><img src="img/${i.img}.jpg" alt="" width="48" height="48" loading="lazy"><span><b>${i.title}</b><small>входит всегда</small></span></li>`
+    ? `<li><img src="img/${i.img}.webp" alt="" width="48" height="48" loading="lazy"><span><b>${i.title}</b><small>входит всегда</small></span></li>`
     : `<li><span class="num">✓</span><span><b>${i.title}</b><small>входит всегда</small></span></li>`));
   $("#inclList").innerHTML = incl.join("");
 
@@ -845,11 +846,11 @@ function watchSections() {
 /* gallery */
 const PHOTOS = ["t8", "t5", "t10", "t7", "t4", "t13", "t6"];
 $("#gallery").innerHTML = PHOTOS.map((f, i) =>
-  `<button class="shot" type="button" data-shot="${i}" aria-label="Открыть фото ${i + 1}"><img src="img/t/sm/${f}.jpg" alt="Стол, накрытый Светланой" width="420" height="560" loading="lazy"></button>`).join("");
+  `<button class="shot" type="button" data-shot="${i}" aria-label="Открыть фото ${i + 1}"><img src="img/t/sm/${f}.webp" alt="Стол, накрытый Светланой" width="420" height="560" loading="lazy"></button>`).join("");
 let lbIndex = 0, lbFocus = null;
 function lbShow(i) {
   lbIndex = (i + PHOTOS.length) % PHOTOS.length;
-  $("#lbImg").src = `img/t/${PHOTOS[lbIndex]}.jpg`;
+  $("#lbImg").src = `img/t/${PHOTOS[lbIndex]}.webp`;
   $("#lbCount").textContent = `${lbIndex + 1} из ${PHOTOS.length}`;
 }
 function lbOpen(i) { lbFocus = document.activeElement; lbShow(i); $("#lightbox").hidden = false; $("#lbClose").focus(); }
