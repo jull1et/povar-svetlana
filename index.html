@@ -124,14 +124,21 @@ h1 {
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--chalk-faint);
 }
-.cats-in { max-width: 620px; margin-inline: auto; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
-.cats-in::-webkit-scrollbar { display: none; }
+/* все кнопки видны целиком: если не помещаются в строку, переносятся на следующую */
+.cats-in { max-width: 620px; margin-inline: auto; display: flex; flex-wrap: wrap; gap: 6px; }
 .chip {
   flex: none; padding: 9px 15px; border-radius: 999px; border: 1px solid var(--chalk-faint);
   color: var(--chalk-dim); text-decoration: none; font-size: 14px; font-weight: 500; white-space: nowrap;
   transition: background-color .2s ease, color .2s ease, border-color .2s ease;
 }
 .chip.active { background: var(--saffron); color: var(--on-saffron); border-color: var(--saffron); }
+.chip .short { display: none; }
+@media (max-width: 559px) {
+  .cats { padding-block: 8px; }
+  .chip { padding: 7px 11px; font-size: 13px; }
+  .chip .full { display: none; }
+  .chip .short { display: inline; }
+}
 
 /* sections */
 section.cat { padding-top: 30px; scroll-margin-top: 64px; }
@@ -373,6 +380,8 @@ html.lb-open, html.lb-open body { overflow: hidden; }
   .hero { grid-template-columns: 1fr 1fr; align-items: end; column-gap: 24px; }
   .wrap { max-width: 760px; }
   .bar-in, .cats-in { max-width: 760px; }
+  .cats-in { justify-content: space-between; }
+  .chip { padding: 8px 13px; }
   .plates { grid-row: span 3; align-self: center; }
 }
 </style>
@@ -592,8 +601,12 @@ function load() {
 function save() { try { localStorage.setItem("svetlana-menu-v2", JSON.stringify({ guests, sel })); } catch (e) {} }
 
 function render() {
+  // [раздел, полная подпись, короткая подпись для телефона]
+  const SHORT = { photos: "Фото", price: "Цены", extra: "Ещё" };
   const chips = [["incl", "Что входит"], ["photos", "Фото столов"], ["price", "Стоимость"]].concat(CATS.map(c => [c.id, c.title]));
-  $("#chips").innerHTML = chips.map(([id, t]) => `<a class="chip" href="#${id}" data-for="${id}">${t}</a>`).join("");
+  $("#chips").innerHTML = chips.map(([id, t]) => SHORT[id]
+    ? `<a class="chip" href="#${id}" data-for="${id}" aria-label="${t}"><span class="full">${t}</span><span class="short">${SHORT[id]}</span></a>`
+    : `<a class="chip" href="#${id}" data-for="${id}">${t}</a>`).join("");
 
   let html = "";
   for (const c of CATS) {
@@ -804,12 +817,6 @@ function watchSections() {
     if (id === current) return;
     current = id;
     box.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c.dataset.for === id));
-    const chip = box.querySelector(`[data-for="${id}"]`);
-    if (!chip) return;
-    // сдвигаем ряд кнопок, только если активная кнопка ушла за край
-    const left = chip.offsetLeft, right = left + chip.offsetWidth;
-    if (left < box.scrollLeft + 8) box.scrollTo({ left: Math.max(0, left - 16) });
-    else if (right > box.scrollLeft + box.clientWidth - 8) box.scrollTo({ left: right - box.clientWidth + 16 });
   }
   // активный раздел = последний, чей заголовок уже под полоской кнопок
   function compute() {
